@@ -118,7 +118,7 @@ xDim print; "," print; yDim println
     for (x, 0, xDim - 1,
         for (y, 0, yDim - 1,
 x print; "," print; y print; "," print; self get(x,y) println
-              newMatrix set(y, x, self get(x, y))
+#              newMatrix set(y, x, self get(x, y))
         )
     )
     return newMatrix
@@ -131,4 +131,25 @@ before println
 after := before transpose
 "after" println
 after println
+
+
+# #########################################################
+# write a program that gives you tem guesses at a random number
+
+Guesser := Object clone
+Guesser go := method(
+
+   randomNumber := (Random value(99) + 1) floor()
+randomNumber println
+
+   "what is your guess between 1 and 100" println
+   for(i, 1, 10,
+     write("guess [", i, "] :- ")
+     guess := File standardInput readLine asNumber
+     if (guess == randomNumber, break)
+   )
+
+)
+
+Guesser go
 
