@@ -37,6 +37,11 @@ Vagrant::Config.run do |config|
 
   config.vm.share_folder "ruby", "/vagrant_data/ruby", "ruby"
   config.vm.share_folder "io", "/vagrant_data/io", "io"
+  config.vm.share_folder "prolog", "/vagrant_data/prolog", "prolog"
+  config.vm.share_folder "scala", "/vagrant_data/scala", "scala"
+  config.vm.share_folder "erlang", "/vagrant_data/erlang", "erlang"
+  config.vm.share_folder "clojure", "/vagrant_data/clojure", "clojure"
+  config.vm.share_folder "haskell", "/vagrant_data/haskell", "haskell"
   # Enable provisioning with Puppet stand alone.  Puppet manifests
   # are contained in a directory path relative to this Vagrantfile.
   # You will need to create the manifests directory and a manifest in
@@ -97,5 +102,5 @@ Vagrant::Config.run do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-config.vm.provision :shell, :path => "provision.sh"
+  # config.vm.provision :shell, :path => "provision.sh"
 end
