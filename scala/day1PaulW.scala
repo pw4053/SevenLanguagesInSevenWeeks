@@ -5,21 +5,13 @@
 //    1 2 3
 //    4 5 6
 //    7 8 9
-
 import collection.mutable.MutableList 
 
-object Marker extends Enumeration {
-     type Marker = String
-     val EMPTY = " ";
-     val X = "X";
-     val O = "O";
-}
 
-import Marker._
-
-class BoardCell() {
+class TicTacToeBoardCell() {
+   val EMPTY = " ";
+   val validCellValues = List("X","O");
    var cellValue = EMPTY;
-   val validCellValues = List(X,O);
 
    def setCellValue(value:String) = {
      if (!isValidValue(value)) {
@@ -28,7 +20,11 @@ class BoardCell() {
      if (isOccupied()) {
         throw new IllegalArgumentException("Cannot change cell value.");
      }
-     this.cellValue = value;
+     cellValue = value;
+   }
+
+   def == (target: TicTacToeBoardCell ):Boolean = {
+     return this.getCellValue() == target.getCellValue();
    }
 
    override def toString():String = {
@@ -40,7 +36,7 @@ class BoardCell() {
    }
 
    def isOccupied() = {
-      this.getCellValue() != Marker.EMPTY;
+      getCellValue() != EMPTY;
    }
 
    def isValidValue(value:String) = {
@@ -48,52 +44,36 @@ class BoardCell() {
    }
 
    def getCellValue() = {
-      this.cellValue;
+      cellValue;
    }
 }
 
-class Board(size: Int) {
-   val boardSize = size;
-   val board = new MutableList[BoardCell];
-   for(i <- 0 until calculateBoardSlots()) {
-     board += new BoardCell();
+class TicTacToeBoard() {
+   val boardSize = 3;
+   val board = new MutableList[TicTacToeBoardCell];
+   for (i <- 0 until calculateBoardSlots()) {
+     board += new TicTacToeBoardCell();
    }
 
 
-   def rows() = {
-      board.grouped(boardSize);
-   }
-
-   def cols() = {
-      board.zipWithIndex.groupBy(_._2 % boardSize).map(_._2.map(_._1))
-   }
-
-   def diags() = {
-      MutableList(
-        board.zipWithIndex.filter(_._2 % (boardSize + 1) == 0).map(_._1),
-        board.zipWithIndex.filter(value => (value._2 % (boardSize) == 0) && (value._2 > 0) && (value._2 < board.length)).map(_._1)
-      )
-   }
+   val winningCombinations = List(
+      List(0,1,2), List(3,4,5), List(6,7,8),         // rows
+      List(0,3,6), List(1,4,7), List(2,5,8),         // columns
+      List(0,4,8), List(2,4,6)                       // diagonals
+   );
 
 
-   def allEqualxxxx(elements: MutableList[Marker]) = {
-     !elements.contains(Marker.EMPTY) && elements.distinct.size == 1;
-   }
-   def allEqual(elements: MutableList[BoardCell]) = {
-     !elements.contains(Marker.EMPTY) && elements.distinct.size == 1;
-   }
-   def anyListAllEqual(lists: TraversableOnce[MutableList[Marker]]): Boolean = {
-      lists.foldLeft(false)(_ || allEqual(_));
-   }
-   def anyListAllEqual(lists: MutableList[MutableList[Marker]]): Boolean = {
-      anyListAllEqual(lists.toIterator);
-   }
    def boardWon(): Boolean  = {
-//    anyListAllEqual(rows()) || anyListAllEqual(cols()) || anyListAllEqual(diags());
+      winningCombinations.foreach(path =>
+        if (pathContainsWinner(path)) {
+           return true;
+        }      
+      );
      return false;
    }
+
    def boardFull(): Boolean = {
-      board.count(!_.isOccupied()) == 1;
+      board.count(!_.isOccupied()) == 0;
    }
 
    def setCellValue(index:Int, value:String):Boolean = {
@@ -106,9 +86,9 @@ class Board(size: Int) {
 
    override def toString():String = {
      var result = "\n";
-     for(i <- 1 until calculateBoardSlots()) {
+     for(i <- 0 until calculateBoardSlots()) {
        result += " " + board(i);
-       if (i > 0 && i % boardSize == 0) {
+       if ((i+1) % boardSize == 0) {
           result += " \n";
        }
      }
@@ -117,14 +97,14 @@ class Board(size: Int) {
 
    def showEmptyCells():String = {
      var result = "\n";
-     for(i <- 1 until calculateBoardSlots()) {
+     for(i <- 0 until calculateBoardSlots()) {
        result += " ";
        if (board(i).isOccupied()) {
           result += " ";
        } else {
           result += i;
        }
-       if (i % boardSize == 0) {
+       if ((i+1) % boardSize == 0) {
           result += " \n";
        }
      }
@@ -132,14 +112,21 @@ class Board(size: Int) {
    }
 
    def calculateBoardSlots() = {
-     boardSize * boardSize + 1;
-    }
+     boardSize * boardSize;
+   }
 
+   def pathContainsWinner(path: List[Int]) = {
+      val cell1 = board(path(0));
+      val cell2 = board(path(1));
+      val cell3 = board(path(2));
+ 
+      cell1.isOccupied() && cell1 == cell2 && cell1 == cell3;
+   }
 }
 
 class TicTacToeGame() {
 
-    val board = new Board(3);
+    val board = new TicTacToeBoard();
     var currentPlayer = "X";
 
     def getNextPlayer(player:String):String = {
